@@ -187,6 +187,7 @@ var commandHistory = (function() {
 //
 // Input UI
 //
+
 var input = {};
 function initInput() {
 
@@ -255,7 +256,7 @@ function initInput() {
   }
   input.clear = clear;
 
-  if (typeof CodeMirror !== 'undefined') {
+  if (false){// if (typeof CodeMirror !== 'undefined') {
     var BRACKETS = '()[]{}';
 
     // Single Line
@@ -362,8 +363,15 @@ function initInput() {
     });
 
     input.getValue = function() {
-      return $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value;
+
+      const values = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value;
+      //convert from portugese to english
+      const commands = translateSuperLogoPortugueseToEnglish(values)
+      console.log('values', values, commands)
+
+      return commands
     };
+
     input.setValue = function(v) {
       $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value = v;
     };
@@ -470,6 +478,63 @@ function initInput() {
 //
 // Code snippets
 //
+
+function translateSuperLogoPortugueseToEnglish(input) {
+  const map = [
+    // movement
+    { pt: /\bparafrente\b/gi, en: 'forward' },
+    { pt: /\bpf\b/gi, en: 'forward' },
+    { pt: /\bparatrás\b/gi, en: 'backward' },
+    { pt: /\bpt\b/gi, en: 'backward' },
+    { pt: /\bparadireita\b/gi, en: 'right' },
+    { pt: /\bpd\b/gi, en: 'right' },
+    { pt: /\bparaesquerda\b/gi, en: 'left' },
+    { pt: /\bpe\b/gi, en: 'left' },
+
+    // screen & turtle
+    { pt: /\btat\b/gi, en: 'clear screen' },
+    { pt: /\btartaruga\b/gi, en: 'clear screen' },
+    { pt: /\bun\b/gi, en: 'pen up' },
+    { pt: /\busenada\b/gi, en: 'pen up' },
+    { pt: /\bul\b/gi, en: 'pen down' },
+    { pt: /\buselápis\b/gi, en: 'pen down' },
+    { pt: /\bub\b/gi, en: 'eraser on' },
+    { pt: /\buseborracha\b/gi, en: 'eraser on' },
+    { pt: /\bdt\b/gi, en: 'hide turtle' },
+    { pt: /\bdesapareçatat\b/gi, en: 'hide turtle' },
+    { pt: /\bat\b/gi, en: 'show turtle' },
+    { pt: /\bapareçatat\b/gi, en: 'show turtle' },
+
+    // color
+    { pt: /\bmudecl\s+(\d+)/gi, en: 'setcolor $1' },
+    { pt: /\bmudecl\b/gi, en: 'setcolor' },
+    { pt: /\bmudecf\s+(\d+)/gi, en: 'setbgcolor $1' },
+    { pt: /\bmudecf\b/gi, en: 'setbgcolor' },
+
+    // fill
+    { pt: /\bmudecp\s+(\d+)/gi, en: 'setfillcolor $1' },
+    { pt: /\bmudecp\b/gi, en: 'setfillcolor' },
+    { pt: /\bpinte\b/gi, en: 'fill' },
+
+    // control and arithmetic
+    { pt: /\brepita\s+(\d+)/gi, en: 'repeat $1' },
+    { pt: /\brepita\b/gi, en: 'repeat' },
+    { pt: /\bmais\b/gi, en: '+' },
+    { pt: /\bmenos\b/gi, en: '-' },
+    { pt: /\bvezes\b/gi, en: '*' },
+    { pt: /\bdividido por\b/gi, en: '/' },
+
+  ];
+
+  let out = input;
+  map.forEach(({ pt, en }) => {
+    out = out.replace(pt, en);
+  });
+  return out;
+}
+
+
+  
 var snippets = new Map();
 function insertSnippet(text, parent, key, options) {
   options = options || {};
