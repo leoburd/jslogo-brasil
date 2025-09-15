@@ -215,6 +215,7 @@ function initInput() {
   };
 
   function run(remote) {
+    console.log('run pressed')
     if (remote !== true && window.TogetherJS && window.TogetherJS.running) {
       TogetherJS.send({type: "run"});
     }
