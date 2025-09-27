@@ -399,9 +399,12 @@ function initInput() {
     input.setFocus();
   });
 
-  $('#run').addEventListener('click', run);
-  $('#stop').addEventListener('click', stop);
-  $('#clear').addEventListener('click', clear);
+  var runBtn = $('#run');
+  if (runBtn) runBtn.addEventListener('click', run);
+  var stopBtn = $('#stop');
+  if (stopBtn) stopBtn.addEventListener('click', stop);
+  var clearBtn = $('#clear');
+  if (clearBtn) clearBtn.addEventListener('click', clear);
 
   window.addEventListener('message', function(e) {
     if ('example' in e.data) {
@@ -421,13 +424,18 @@ function initInput() {
   window.addEventListener('resize', resize);
   window.addEventListener('DOMContentLoaded', resize);
   function resize() {
-    var box = $('#display-panel .inner'), rect = box.getBoundingClientRect(),
-        w = rect.width, h = rect.height;
-    $('#sandbox').width = w; $('#sandbox').height = h;
-    $('#turtle').width = w; $('#turtle').height = h;
-    $('#overlay').width = w; $('#overlay').height = h;
+    var box = $('#display-panel .inner') || $('#display-panel');
+    if (!box) return;
+    var rect = box.getBoundingClientRect();
+    var w = rect.width, h = rect.height;
+    var sandbox = $('#sandbox');
+    var turtleCanvas = $('#turtle');
+    var overlay = $('#overlay');
+    if (sandbox) { sandbox.width = w; sandbox.height = h; }
+    if (turtleCanvas) { turtleCanvas.width = w; turtleCanvas.height = h; }
+    if (overlay) { overlay.width = w; overlay.height = h; }
 
-    if (logo && turtle) {
+    if (logo && turtle && typeof turtle.resize === 'function') {
       turtle.resize(w, h);
       logo.run('cs');
     }
@@ -565,7 +573,7 @@ function insertSnippet(text, parent, key, options) {
     container.appendChild(document.createTextNode(text));
   }
 
-  if (!options.noScroll) {
+  if (!options.noScroll && parent && typeof parent === 'object') {
     if (parent.scrollTimeoutId)
       clearTimeout(parent.scrollTimeoutId);
     parent.scrollTimeoutId = setTimeout(function() {
@@ -695,23 +703,28 @@ window.addEventListener('DOMContentLoaded', function() {
     return true;
   }
 
-  $('#savelibrary').addEventListener('click', function() {
+  var saveLibraryBtn = $('#savelibrary');
+  if (saveLibraryBtn) saveLibraryBtn.addEventListener('click', function() {
     var library = logo.procdefs().replace('\n', '\r\n');
     var url = 'data:text/plain,' + encodeURIComponent(library);
     if (!saveDataAs(url, 'logo_library.txt'))
       Dialog.alert("Sorry, not supported by your browser");
   });
-  $('#screenshot').addEventListener('click', function() {
+  var screenshotBtn = $('#screenshot');
+  if (screenshotBtn) screenshotBtn.addEventListener('click', function() {
     var canvas = document.querySelector('#sandbox');
+    if (!canvas) return;
     var url = canvas.toDataURL('image/png');
     if (!saveDataAs(url, 'logo_drawing.png'))
       Dialog.alert("Sorry, not supported by your browser");
   });
-  $('#clearhistory').addEventListener('click', function() {
+  var clearHistoryBtn = $('#clearhistory');
+  if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', function() {
     if (!confirm(__('Clear history: Are you sure?'))) return;
     clearhistoryhook();
   });
-  $('#clearlibrary').addEventListener('click', function() {
+  var clearLibraryBtn = $('#clearlibrary');
+  if (clearLibraryBtn) clearLibraryBtn.addEventListener('click', function() {
     if (!confirm(__('Clear library: Are you sure?'))) return;
     logo.run('erall');
   });
