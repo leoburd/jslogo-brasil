@@ -949,6 +949,9 @@ function LogoInterpreter(turtle, stream, savehook)
 
   self.dispatch = function(name, tokenlist, natural) {
     name = name.toUpperCase();
+    if (self.keywordAlias) {
+      name = self.keywordAlias(name) || name;
+    }
     var procedure = self.routines.get(name);
     if (!procedure) {
 
@@ -1288,6 +1291,11 @@ function LogoInterpreter(turtle, stream, savehook)
   //
   // Procedures and Flow Control
   //
+
+
+  def('end', function() {
+  });
+
   def("to", function(list) {
     var name = sexpr(list.shift());
     if (isNumber(name) || isOperator(name))

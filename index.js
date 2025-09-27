@@ -485,8 +485,8 @@ function translateSuperLogoPortugueseToEnglish(input) {
     // movement
     { pt: /\bparafrente\b/gi, en: 'forward' },
     { pt: /\bpf\b/gi, en: 'forward' },
-    { pt: /\bparatrás\b/gi, en: 'backward' },
-    { pt: /\bpt\b/gi, en: 'backward' },
+    { pt: /\bparatrás\b/gi, en: 'back' },
+    { pt: /\bpt\b/gi, en: 'back' },
     { pt: /\bparadireita\b/gi, en: 'right' },
     { pt: /\bpd\b/gi, en: 'right' },
     { pt: /\bparaesquerda\b/gi, en: 'left' },
@@ -674,10 +674,13 @@ window.addEventListener('DOMContentLoaded', function() {
         savehook(name, def);
       }
     });
+  // addTranslation(logo) -- no longer needed, aliases are in localization file
   logo.run('cs');
   initStorage(function (def) {
     logo.run(def);
   });
+
+  // addTranslation function removed -- all aliases are now in the localization file
 
   function saveDataAs(dataURL, filename) {
     if (!('download' in document.createElement('a')))
@@ -764,6 +767,13 @@ window.addEventListener('DOMContentLoaded', function() {
           logo.keywordAlias = function(s) {
             return data.interpreter.keywords[s];
           };
+          // Register all keyword aliases as synonyms for their English commands
+          Object.keys(data.interpreter.keywords).forEach(function(alias) {
+            var eng = data.interpreter.keywords[alias];
+            if (logo.routines && logo.routines.get && logo.routines.set && logo.routines.get(eng)) {
+              logo.routines.set(alias, logo.routines.get(eng));
+            }
+          });
         }
 
         if ('procedures' in data.interpreter) {
@@ -832,13 +842,10 @@ window.addEventListener('DOMContentLoaded', function() {
       });
     });
 
-  localizationComplete.then(initInput);
-
-  //
-  // Populate "Examples" sidebar
-  // (URL may be overwritten by localization file)
-  //
   localizationComplete.then(function() {
+    // Keyword aliases are now loaded from l10n/lang-pt.json
+    initInput();
+    // Populate "Examples" sidebar
     fetch(examples)
       .then(function(response) {
         if (!response.ok) throw Error(response.statusText);
@@ -853,6 +860,10 @@ window.addEventListener('DOMContentLoaded', function() {
         });
       });
   });
+
+  //
+  // Populate "Examples" sidebar now handled above
+  //
 
   //
   // Demo
