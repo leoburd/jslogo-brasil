@@ -333,9 +333,10 @@ function initInput() {
   } else {
     // Fallback in case of no CodeMirror
 
-    $('#logo-ta-single-line').addEventListener('keydown', function(e) {
 
-     var elem = $('#logo-ta-single-line');
+    var singleLine = $('#logo-ta-single-line');
+    if (singleLine) singleLine.addEventListener('keydown', function(e) {
+      var elem = singleLine;
 
       var keyMap = {
         'Enter': function(elem) {
@@ -364,29 +365,34 @@ function initInput() {
     });
 
     input.getValue = function() {
-
-      const values = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value;
+      var elem = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line');
+      if (!elem) return '';
+      const values = elem.value;
       //convert from portugese to english
       const commands = translateSuperLogoPortugueseToEnglish(values)
       console.log('values', values, commands)
-
       return commands
     };
 
     input.setValue = function(v) {
-      $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value = v;
+      var elem = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line');
+      if (elem) elem.value = v;
     };
     input.setFocus = function() {
-      $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').focus();
+      var elem = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line');
+      if (elem) elem.focus();
     };
   }
 
+
   input.setFocus();
-  $('#input').addEventListener('click', function() {
+  var inputDiv = $('#input');
+  if (inputDiv) inputDiv.addEventListener('click', function() {
     input.setFocus();
   });
 
-  $('#toggle').addEventListener('click', function() {
+  var toggleBtn = $('#toggle');
+  if (toggleBtn) toggleBtn.addEventListener('click', function() {
     var v = input.getValue();
     document.body.classList.toggle('single');
     document.body.classList.toggle('multi');
@@ -450,8 +456,11 @@ function initInput() {
   var sidebars = Array.from($$('#sidebar .choice')).map(
     function(elem) { return elem.id; });
   sidebars.forEach(function(k) {
-    $('#sb-link-' + k).addEventListener('click', function() {
-      var cl = $('#sidebar').classList;
+    var sbLink = $('#sb-link-' + k);
+    if (sbLink) sbLink.addEventListener('click', function() {
+      var sidebarElem = $('#sidebar');
+      if (!sidebarElem) return;
+      var cl = sidebarElem.classList;
       sidebars.forEach(function(sb) { cl.remove(sb); });
       cl.add(k);
     });
@@ -582,7 +591,7 @@ function insertSnippet(text, parent, key, options) {
     }, 100);
   }
 
-  if (snippet.parentElement !== parent)
+  if (snippet.parentElement !== parent && parent)
     parent.appendChild(snippet);
 }
 function removeSnippet(parent, key) {
@@ -839,20 +848,22 @@ window.addEventListener('DOMContentLoaded', function() {
     })
     .then(function(text) {
       var select = $('#select-lang');
-      text.split(/\r?\n/g).forEach(function(entry) {
-        var match = /^(\w+)\s+(.*)$/.exec(entry);
-        if (!match) return;
-        var opt = document.createElement('option');
-        opt.value = match[1];
-        opt.textContent = match[2];
-        select.appendChild(opt);
-      });
-      select.value = document.body.lang;
-      select.addEventListener('change', function() {
-        var url = String(document.location);
-        url = url.replace(/[?#].*/, '');
-        document.location = url + '?lang=' + select.value;
-      });
+      if (select) {
+        text.split(/\r?\n/g).forEach(function(entry) {
+          var match = /^(\w+)\s+(.*)$/.exec(entry);
+          if (!match) return;
+          var opt = document.createElement('option');
+          opt.value = match[1];
+          opt.textContent = match[2];
+          select.appendChild(opt);
+        });
+        select.value = document.body.lang;
+        select.addEventListener('change', function() {
+          var url = String(document.location);
+          url = url.replace(/[?#].*/, '');
+          document.location = url + '?lang=' + select.value;
+        });
+      }
     });
 
   localizationComplete.then(function() {

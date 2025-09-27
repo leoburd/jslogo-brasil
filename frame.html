@@ -1,39 +1,115 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>Logo Frame</title>
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="logo.css">
   <link rel="icon" href="favicon.ico">
-  <style>
-    body { margin: 0; padding: 0; background: #fff; }
-    #display-panel { margin: 0 auto; max-width: 600px; }
-    #controls { display: flex; gap: 8px; margin: 10px 0; }
-    #logo-ta-multi-line { width: 100%; height: 80px; font-family: monospace; font-size: 1em; }
-    #sandbox, #turtle, #overlay { display: block; margin: 0 auto; }
-  </style>
 </head>
-<body>
-  <div id="display-panel">
-    <canvas id="sandbox" width="400" height="400"></canvas>
-    <canvas id="turtle" width="400" height="400" style="position:absolute;left:0;top:0;"></canvas>
-    <div id="overlay"></div>
-    <div id="controls">
-      <textarea id="logo-ta-multi-line" placeholder="Digite seu código Logo aqui..."></textarea>
-      <button id="run">Executar</button>
-      <button id="clear">Limpar</button>
+<body class="multi">
+  <style>
+    /* Override right margin for minimal frame */
+    #topbar, #display-panel, #input-panel { right: 0 !important; }
+  </style>
+
+  <div id="display-panel" class="panel">
+    <div id="display">
+      <div class="inner">
+        <canvas id="sandbox" width="450" height="250">
+          <span data-l10n-id="no-canvas">Your browser does not support the canvas element - sorry!</span>
+        </canvas>
+        <canvas id="turtle" width="450" height="250"></canvas>
+        <div id="overlay"></div>
+        <div id="error"></div>
+      </div>
     </div>
   </div>
+
+  <div id="input-panel" class="panel">
+  <div id="run" class="label" data-l10n-id="ip-button-run">Run</div>
+  <div id="stop" class="label" data-l10n-id="ip-button-stop" style="display:none;">Stop</div>
+  <div id="clear" class="label" data-l10n-id="ip-button-clear">Clear</div>
+    <div id="input">
+      <div class="inner">
+        <textarea rows="12" cols="80" placeholder="Type your code here..." data-l10n-id="logo-ta-multi-line" id="logo-ta-multi-line"></textarea>
+      </div>
+    </div>
+  </div>
+
   <script src="logo.js"></script>
   <script src="turtle.js"></script>
   <script src="index.js"></script>
   <script>
-    // Inicialização simplificada para frame.html
+    // Responsive canvas and textarea sizing
+    function resizeTurtleArea() {
+      // No-op: let CSS and fixed canvas width/height handle layout as in index.html
+    }
+    window.addEventListener('resize', resizeTurtleArea);
     window.addEventListener('DOMContentLoaded', function() {
-      // Foca no campo de texto ao carregar
-      document.getElementById('logo-ta-multi-line').focus();
+      resizeTurtleArea();
+      var ta = document.getElementById('logo-ta-multi-line');
+      if (ta) ta.focus();
+      var ready = (window.localizationComplete && typeof window.localizationComplete.then === 'function')
+        ? window.localizationComplete
+        : Promise.resolve();
+      ready.then(function() {
+        // Use global logo/turtle as in index.js
+        var canvas_element = document.getElementById('sandbox');
+        var canvas_ctx = canvas_element.getContext('2d');
+        var turtle_element = document.getElementById('turtle');
+        var turtle_ctx = turtle_element.getContext('2d');
+        var overlay = document.getElementById('overlay');
+        turtle = new CanvasTurtle(
+          canvas_ctx,
+          turtle_ctx,
+          canvas_element.width, canvas_element.height, overlay
+        );
+        turtle.visible = true;
+        var stream = {
+          read: function(s) { return Promise.resolve(''); },
+          write: function() { return Promise.resolve(); },
+          clear: function() { return Promise.resolve(); },
+          readback: function() { return Promise.resolve(''); },
+          get textsize() { return 13; },
+          set textsize(h) {},
+          get font() { return 'monospace'; },
+          set font(f) {},
+          get color() { return 'black'; },
+          set color(c) {}
+        };
+        logo = new LogoInterpreter(turtle, stream, function(){});
+        logo.run('cs');
+        // Minimal run/clear logic, but use same error handling as index.js
+        var runBtn = document.getElementById('run');
+        if (runBtn) {
+          runBtn.onclick = function() {
+            var code = ta ? ta.value : '';
+            var errorDiv = document.getElementById('error');
+            if (errorDiv) {
+              errorDiv.innerHTML = '';
+              errorDiv.classList.remove('shown');
+            }
+            if (logo && code.trim()) {
+              logo.run(code)
+                .catch(function(e) {
+                  if (errorDiv) {
+                    errorDiv.innerHTML = '';
+                    errorDiv.appendChild(document.createTextNode(e.message));
+                    errorDiv.classList.add('shown');
+                  }
+                });
+            }
+          };
+        }
+        var clearBtn = document.getElementById('clear');
+        if (clearBtn) {
+          clearBtn.onclick = function() {
+            if (ta) ta.value = '';
+          };
+        }
+      });
     });
   </script>
+
 </body>
-</html>
