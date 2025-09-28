@@ -867,8 +867,8 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
   localizationComplete.then(function() {
-    // Keyword aliases are now loaded from l10n/lang-pt.json
-    initInput();
+  // Keyword aliases are now loaded from l10n/lang-pt.json
+  initInput();
     // Populate "Examples" sidebar
     fetch(examples)
       .then(function(response) {

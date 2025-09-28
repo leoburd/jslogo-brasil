@@ -31,7 +31,7 @@
       "extras-download-drawing": "Baixar Desenho",
       "extras-clear-history": "Limpar Histórico",
       "extras-clear-library": "Limpar Biblioteca",
-      "history-placeholder": "Os comandos que você digitar aparecerão aqui para que você possa encontrá-los,```
+      "history-placeholder": "Os comandos que você digitar aparecerão aqui para que você possa encontrá-los"
     },
     "messages": {
       "Clear history: Are you sure?": "Limpar histórico: Tem certeza?",
@@ -46,18 +46,18 @@
       "FIM": "END",
       "REPITA": "REPEAT",
       "SE": "IF",
-      "SEENTAO": "IFELSE",
+      "SENÃO": "IFELSE",
       "ENQUANTO": "WHILE"
     },
     "procedures": {
-      "PF": "FD",
       "PARAFRENTE": "FD",
+      "PF": "FD",
       "PARADIREITA": "RT",
       "PD": "RT",
       "PARAESQUERDA": "LT",
       "PE": "LT",
-      "PT": "BK",
       "PARATRÁS": "BK",
+      "PT": "BK",
       "TAT": "CS",
       "TARTARUGA": "CS",
       "UL": "PD",
@@ -73,10 +73,9 @@
       "MUDECL": "SETCOLOR",
       "REPITA": "REPEAT",
       "SE": "IF",
-      "SEENTAO": "IFELSE",
+      "SENÃO": "IFELSE",
       "ENQUANTO": "WHILE"
-    }
-  ,
+    },
     "messages": {
       "Can't apply {_PROC_} to special {name:U}": "Não é possível aplicar {_PROC_} a especial {name:U}",
       "Can't {_PROC_} primitives unless REDEFP is TRUE": "Não é possível executar primitivas {_PROC_} a menos que REDEFP seja VERDADEIRO",
@@ -112,26 +111,26 @@
       "{_PROC_}: Expected non-empty list": "{_PROC_}: Esperada lista não vazia",
       "{_PROC_}: Index out of bounds": "{_PROC_}: Índice fora dos limites"
     }
-  }
-  ,
+  },
   "graphics": {
     "colors": {
-      "preto": "black",
-      "azul": "blue",
-      "lima": "lime",
-      "ciano": "cyan",
-      "vermelho": "red",
-      "magenta": "magenta",
-      "amarelo": "yellow",
-      "branco": "white",
-      "marrom": "brown",
-      "bronze": "tan",
-      "aguamarina": "aquamarine",
-      "salmão": "salmon",
-      "verde": "green",
-      "roxo": "purple",
-      "laranja": "orange",
-      "cinza": "gray"
+        "preto": "black",
+        "azul": "blue",
+        "lima": "lime",
+        "ciano": "cyan",
+        "vermelho": "red",
+        "magenta": "magenta",
+        "amarelo": "yellow",
+        "branco": "white",
+        "marrom": "brown",
+        "bronze": "tan",
+        "aguamarina": "aquamarine",
+        "salmão": "salmon",
+        "verde": "green",
+        "roxo": "purple",
+        "laranja": "orange",
+        "cinza": "gray"
     }
   }
-  }
+}
+
