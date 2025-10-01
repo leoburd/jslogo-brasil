@@ -364,13 +364,10 @@ function initInput() {
     });
 
     input.getValue = function() {
-
       const values = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value;
-      //convert from portugese to english
-      const commands = translateSuperLogoPortugueseToEnglish(values)
-      console.log('values', values, commands)
-
-      return commands
+      // Use the new Logo interpreter translation system instead of old hardcoded translations
+      console.log('values', values)
+      return values;
     };
 
     input.setValue = function(v) {
@@ -667,17 +664,7 @@ window.addEventListener('DOMContentLoaded', function() {
     turtle_ctx,
     canvas_element.width, canvas_element.height, $('#overlay'));
 
-  logo = new LogoInterpreter(
-    turtle, stream,
-    function (name, def) {
-      if (savehook) {
-        savehook(name, def);
-      }
-    });
-  logo.run('cs');
-  initStorage(function (def) {
-    logo.run(def);
-  });
+  // Logo interpreter will be initialized after localization is complete
 
   function saveDataAs(dataURL, filename) {
     if (!('download' in document.createElement('a')))
@@ -719,8 +706,49 @@ window.addEventListener('DOMContentLoaded', function() {
   //
   // Localization
   //
+  console.log('Starting localization setup...');
+  
+  function applyInterpreterLocalization(interpreterData) {
+    if ('messages' in interpreterData) {
+      logo.localize = function(s) {
+        return interpreterData.messages[s];
+      };
+    }
+
+    if ('keywords' in interpreterData) {
+      logo.keywordAlias = function(s) {
+        return interpreterData.keywords[s];
+      };
+    }
+
+    if ('procedures' in interpreterData) {
+      // Set up procedure alias translation
+      console.log('Setting up procedure aliases:', Object.keys(interpreterData.procedures));
+      logo.procedureAlias = function(s) {
+        var translation = interpreterData.procedures[s];
+        if (translation) {
+          console.log('Translating procedure:', s, '->', translation);
+        }
+        return translation;
+      };
+      
+      // Also create procedure copies for backward compatibility
+      (function(aliases) {
+        Object.keys(aliases).forEach(function(alias) {
+          try {
+            logo.copydef(alias, aliases[alias]);
+          } catch (e) {
+            // Ignore errors for procedures that don't exist or can't be copied
+            console.warn('Could not create alias for ' + alias + ': ' + e.message);
+          }
+        });
+      }(interpreterData.procedures));
+    }
+  }
+  
   var localizationComplete = (function() {
     function localize(data) {
+      console.log('Localization data loaded:', data);
       if ('page' in data) {
         if ('dir' in data.page)
           document.body.dir = data.page.dir;
@@ -754,24 +782,12 @@ window.addEventListener('DOMContentLoaded', function() {
       }
 
       if ('interpreter' in data) {
-        if ('messages' in data.interpreter) {
-          logo.localize = function(s) {
-            return data.interpreter.messages[s];
-          };
-        }
-
-        if ('keywords' in data.interpreter) {
-          logo.keywordAlias = function(s) {
-            return data.interpreter.keywords[s];
-          };
-        }
-
-        if ('procedures' in data.interpreter) {
-          (function(aliases) {
-            Object.keys(aliases).forEach(function(alias) {
-              logo.copydef(alias, aliases[alias]);
-            });
-          }(data.interpreter.procedures));
+        // Store interpreter data for later when logo object is created
+        window.logoInterpreterData = data.interpreter;
+        
+        if (logo) {
+          // Logo interpreter already exists, apply settings immediately
+          applyInterpreterLocalization(data.interpreter);
         }
       }
 
@@ -785,13 +801,20 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     var lang = queryParams.lang || navigator.language || navigator.userLanguage;
+    console.log('Detected language:', lang);
+    console.log('Query params:', queryParams);
     if (!lang) return Promise.resolve();
 
     // TODO: Support locale/fallback
     lang = lang.split('-')[0];
+    console.log('Final language after split:', lang);
     document.body.lang = lang;
 
-    if (lang === 'en') return Promise.resolve();
+    if (lang === 'en') {
+      console.log('Language is English, skipping localization');
+      return Promise.resolve();
+    }
+    console.log('Loading language file for:', lang);
     return fetch('l10n/lang-' + lang + '.json')
       .then(function(response) {
         if (!response.ok) throw Error(response.statusText);
@@ -832,7 +855,28 @@ window.addEventListener('DOMContentLoaded', function() {
       });
     });
 
-  localizationComplete.then(initInput);
+  localizationComplete.then(function() {
+    // Initialize Logo interpreter after localization is complete
+    logo = new LogoInterpreter(
+      turtle, stream,
+      function (name, def) {
+        if (savehook) {
+          savehook(name, def);
+        }
+      });
+    
+    // Apply interpreter localization if data was loaded
+    if (window.logoInterpreterData) {
+      applyInterpreterLocalization(window.logoInterpreterData);
+    }
+    
+    logo.run('cs');
+    initStorage(function (def) {
+      logo.run(def);
+    });
+    
+    initInput();
+  });
 
   //
   // Populate "Examples" sidebar
