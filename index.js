@@ -215,7 +215,6 @@ function initInput() {
   };
 
   function run(remote) {
-    console.log('run pressed')
     if (remote !== true && window.TogetherJS && window.TogetherJS.running) {
       TogetherJS.send({type: "run"});
     }
@@ -366,7 +365,6 @@ function initInput() {
     input.getValue = function() {
       const values = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value;
       // Use the new Logo interpreter translation system instead of old hardcoded translations
-      console.log('values', values)
       return values;
     };
 
@@ -401,7 +399,7 @@ function initInput() {
   $('#clear').addEventListener('click', clear);
 
   window.addEventListener('message', function(e) {
-    if ('example' in e.data) {
+    if (e.data && typeof e.data === 'object' && 'example' in e.data) {
       var text = e.data.example;
       input.setSingle();
       input.setValue(text);
@@ -706,7 +704,6 @@ window.addEventListener('DOMContentLoaded', function() {
   //
   // Localization
   //
-  console.log('Starting localization setup...');
   
   function applyInterpreterLocalization(interpreterData) {
     if ('messages' in interpreterData) {
@@ -723,13 +720,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
     if ('procedures' in interpreterData) {
       // Set up procedure alias translation
-      console.log('Setting up procedure aliases:', Object.keys(interpreterData.procedures));
       logo.procedureAlias = function(s) {
-        var translation = interpreterData.procedures[s];
-        if (translation) {
-          console.log('Translating procedure:', s, '->', translation);
-        }
-        return translation;
+        return interpreterData.procedures[s];
       };
       
       // Also create procedure copies for backward compatibility
@@ -748,7 +740,6 @@ window.addEventListener('DOMContentLoaded', function() {
   
   var localizationComplete = (function() {
     function localize(data) {
-      console.log('Localization data loaded:', data);
       if ('page' in data) {
         if ('dir' in data.page)
           document.body.dir = data.page.dir;
@@ -801,20 +792,15 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     var lang = queryParams.lang || navigator.language || navigator.userLanguage;
-    console.log('Detected language:', lang);
-    console.log('Query params:', queryParams);
     if (!lang) return Promise.resolve();
 
     // TODO: Support locale/fallback
     lang = lang.split('-')[0];
-    console.log('Final language after split:', lang);
     document.body.lang = lang;
 
     if (lang === 'en') {
-      console.log('Language is English, skipping localization');
       return Promise.resolve();
     }
-    console.log('Loading language file for:', lang);
     return fetch('l10n/lang-' + lang + '.json')
       .then(function(response) {
         if (!response.ok) throw Error(response.statusText);
