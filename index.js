@@ -718,6 +718,8 @@ window.addEventListener('DOMContentLoaded', function() {
       };
     }
 
+
+
     if ('procedures' in interpreterData) {
       // Set up procedure alias translation
       logo.procedureAlias = function(s) {
@@ -782,17 +784,19 @@ window.addEventListener('DOMContentLoaded', function() {
         }
       }
 
-      if ('graphics' in data) {
-        if ('colors' in data.graphics) {
-          turtle.colorAlias = function(s) {
-            var color = data.graphics.colors[s];
-            if (color) {
-              console.log('DEBUG: Translating color', s, '->', color);
-            }
-            return color;
+      if ('graphics' in data && 'colors' in data.graphics) {
+        // Store color data for later when logo object is created
+        window.logoColorData = data.graphics.colors;
+        
+        if (logo) {
+          // Logo interpreter already exists, apply colors immediately
+          logo.colorAlias = function(s) {
+            return data.graphics.colors[s];
           };
         }
       }
+
+
     }
 
     var lang = queryParams.lang || navigator.language || navigator.userLanguage;
@@ -858,6 +862,13 @@ window.addEventListener('DOMContentLoaded', function() {
     // Apply interpreter localization if data was loaded
     if (window.logoInterpreterData) {
       applyInterpreterLocalization(window.logoInterpreterData);
+    }
+    
+    // Apply color translations if data was loaded
+    if (window.logoColorData) {
+      logo.colorAlias = function(s) {
+        return window.logoColorData[s];
+      };
     }
     
     logo.run('cs');
