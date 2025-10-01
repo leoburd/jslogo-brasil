@@ -8,7 +8,7 @@ aprenda quadrado :tamanho
   repita 4 [ pf :tamanho pd 90 ]
 fim
 aprenda coraleatoria
-  mudecl escolha [ vermelho laranja amarelo verde azul roxo ]
+  mudecl escolha [ vermelho laranja amarelo verde azul violeta ]
 fim
 tartaruga
 repita 36 [ coraleatoria quadrado aleatório 200 pd 10 ]
@@ -17,9 +17,9 @@ tartaruga janela desaparecatat
 repita 144 [
   mudealturarotulo contevezes
   usenada
-  pf conte * contevezes / 30
+  pf contevezes * contevezes / 30
   rotule "Logo
-  pt conte * contevezes / 30
+  pt contevezes * contevezes / 30
   ul
   pd 10
   espere 5

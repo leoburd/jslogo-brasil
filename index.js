@@ -785,7 +785,11 @@ window.addEventListener('DOMContentLoaded', function() {
       if ('graphics' in data) {
         if ('colors' in data.graphics) {
           turtle.colorAlias = function(s) {
-            return data.graphics.colors[s];
+            var color = data.graphics.colors[s];
+            if (color) {
+              console.log('DEBUG: Translating color', s, '->', color);
+            }
+            return color;
           };
         }
       }
