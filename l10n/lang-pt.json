@@ -1,7 +1,7 @@
 {
   "page": {
     "dir": "ltr",
-    "examples": "examples.txt",
+    "examples": "l10n/examples-pt.txt",
     "translations": {
       "title": "Logo em Português",
       "tl-title": "Logo em Português",
@@ -101,7 +101,16 @@
       "LEIAL": "READLIST",
       "LEIAPALAVRA": "READWORD",
       "LEIAP": "READWORD",
-      "ROTULE": "LABEL"
+      "ROTULE": "LABEL",
+      "ESCOLHA": "PICK",
+      "ALEATÓRIO": "RANDOM",
+      "ALEATORIO": "RANDOM",
+      "JANELA": "WINDOW",
+      "PARE": "STOP",
+      "CONTEVEZES": "REPCOUNT",
+      "CV": "REPCOUNT",
+      "MUDEALTURAROTULO": "SETLABELHEIGHT",
+      "MUDETAT": "SETTURTLE"
     },
     "messages": {
       "Can't apply {_PROC_} to special {name:U}": "Não é possível aplicar {_PROC_} a especial {name:U}",
