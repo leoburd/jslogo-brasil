@@ -215,7 +215,6 @@ function initInput() {
   };
 
   function run(remote) {
-    console.log('run pressed')
     if (remote !== true && window.TogetherJS && window.TogetherJS.running) {
       TogetherJS.send({type: "run"});
     }
@@ -333,10 +332,9 @@ function initInput() {
   } else {
     // Fallback in case of no CodeMirror
 
+    $('#logo-ta-single-line').addEventListener('keydown', function(e) {
 
-    var singleLine = $('#logo-ta-single-line');
-    if (singleLine) singleLine.addEventListener('keydown', function(e) {
-      var elem = singleLine;
+     var elem = $('#logo-ta-single-line');
 
       var keyMap = {
         'Enter': function(elem) {
@@ -365,31 +363,25 @@ function initInput() {
     });
 
     input.getValue = function() {
-      var elem = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line');
-      if (!elem) return '';
-      const values = elem.value;
-      return values
+      const values = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value;
+      // Use the new Logo interpreter translation system instead of old hardcoded translations
+      return values;
     };
 
     input.setValue = function(v) {
-      var elem = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line');
-      if (elem) elem.value = v;
+      $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').value = v;
     };
     input.setFocus = function() {
-      var elem = $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line');
-      if (elem) elem.focus();
+      $(isMulti() ? '#logo-ta-multi-line' : '#logo-ta-single-line').focus();
     };
   }
 
-
   input.setFocus();
-  var inputDiv = $('#input');
-  if (inputDiv) inputDiv.addEventListener('click', function() {
+  $('#input').addEventListener('click', function() {
     input.setFocus();
   });
 
-  var toggleBtn = $('#toggle');
-  if (toggleBtn) toggleBtn.addEventListener('click', function() {
+  $('#toggle').addEventListener('click', function() {
     var v = input.getValue();
     document.body.classList.toggle('single');
     document.body.classList.toggle('multi');
@@ -402,15 +394,12 @@ function initInput() {
     input.setFocus();
   });
 
-  var runBtn = $('#run');
-  if (runBtn) runBtn.addEventListener('click', run);
-  var stopBtn = $('#stop');
-  if (stopBtn) stopBtn.addEventListener('click', stop);
-  var clearBtn = $('#clear');
-  if (clearBtn) clearBtn.addEventListener('click', clear);
+  $('#run').addEventListener('click', run);
+  $('#stop').addEventListener('click', stop);
+  $('#clear').addEventListener('click', clear);
 
   window.addEventListener('message', function(e) {
-    if ('example' in e.data) {
+    if (e.data && typeof e.data === 'object' && 'example' in e.data) {
       var text = e.data.example;
       input.setSingle();
       input.setValue(text);
@@ -427,18 +416,13 @@ function initInput() {
   window.addEventListener('resize', resize);
   window.addEventListener('DOMContentLoaded', resize);
   function resize() {
-    var box = $('#display-panel .inner') || $('#display-panel');
-    if (!box) return;
-    var rect = box.getBoundingClientRect();
-    var w = rect.width, h = rect.height;
-    var sandbox = $('#sandbox');
-    var turtleCanvas = $('#turtle');
-    var overlay = $('#overlay');
-    if (sandbox) { sandbox.width = w; sandbox.height = h; }
-    if (turtleCanvas) { turtleCanvas.width = w; turtleCanvas.height = h; }
-    if (overlay) { overlay.width = w; overlay.height = h; }
+    var box = $('#display-panel .inner'), rect = box.getBoundingClientRect(),
+        w = rect.width, h = rect.height;
+    $('#sandbox').width = w; $('#sandbox').height = h;
+    $('#turtle').width = w; $('#turtle').height = h;
+    $('#overlay').width = w; $('#overlay').height = h;
 
-    if (logo && turtle && typeof turtle.resize === 'function') {
+    if (logo && turtle) {
       turtle.resize(w, h);
       logo.run('cs');
     }
@@ -453,11 +437,8 @@ function initInput() {
   var sidebars = Array.from($$('#sidebar .choice')).map(
     function(elem) { return elem.id; });
   sidebars.forEach(function(k) {
-    var sbLink = $('#sb-link-' + k);
-    if (sbLink) sbLink.addEventListener('click', function() {
-      var sidebarElem = $('#sidebar');
-      if (!sidebarElem) return;
-      var cl = sidebarElem.classList;
+    $('#sb-link-' + k).addEventListener('click', function() {
+      var cl = $('#sidebar').classList;
       sidebars.forEach(function(sb) { cl.remove(sb); });
       cl.add(k);
     });
@@ -494,6 +475,59 @@ function initInput() {
 // Code snippets
 //
 
+function translateSuperLogoPortugueseToEnglish(input) {
+  const map = [
+    // movement
+    { pt: /\bparafrente\b/gi, en: 'forward' },
+    { pt: /\bpf\b/gi, en: 'forward' },
+    { pt: /\bparatrás\b/gi, en: 'backward' },
+    { pt: /\bpt\b/gi, en: 'backward' },
+    { pt: /\bparadireita\b/gi, en: 'right' },
+    { pt: /\bpd\b/gi, en: 'right' },
+    { pt: /\bparaesquerda\b/gi, en: 'left' },
+    { pt: /\bpe\b/gi, en: 'left' },
+
+    // screen & turtle
+    { pt: /\btat\b/gi, en: 'clear screen' },
+    { pt: /\btartaruga\b/gi, en: 'clear screen' },
+    { pt: /\bun\b/gi, en: 'pen up' },
+    { pt: /\busenada\b/gi, en: 'pen up' },
+    { pt: /\bul\b/gi, en: 'pen down' },
+    { pt: /\buselápis\b/gi, en: 'pen down' },
+    { pt: /\bub\b/gi, en: 'eraser on' },
+    { pt: /\buseborracha\b/gi, en: 'eraser on' },
+    { pt: /\bdt\b/gi, en: 'hide turtle' },
+    { pt: /\bdesapareçatat\b/gi, en: 'hide turtle' },
+    { pt: /\bat\b/gi, en: 'show turtle' },
+    { pt: /\bapareçatat\b/gi, en: 'show turtle' },
+
+    // color
+    { pt: /\bmudecl\s+(\d+)/gi, en: 'setcolor $1' },
+    { pt: /\bmudecl\b/gi, en: 'setcolor' },
+    { pt: /\bmudecf\s+(\d+)/gi, en: 'setbgcolor $1' },
+    { pt: /\bmudecf\b/gi, en: 'setbgcolor' },
+
+    // fill
+    { pt: /\bmudecp\s+(\d+)/gi, en: 'setfillcolor $1' },
+    { pt: /\bmudecp\b/gi, en: 'setfillcolor' },
+    { pt: /\bpinte\b/gi, en: 'fill' },
+
+    // control and arithmetic
+    { pt: /\brepita\s+(\d+)/gi, en: 'repeat $1' },
+    { pt: /\brepita\b/gi, en: 'repeat' },
+    { pt: /\bmais\b/gi, en: '+' },
+    { pt: /\bmenos\b/gi, en: '-' },
+    { pt: /\bvezes\b/gi, en: '*' },
+    { pt: /\bdividido por\b/gi, en: '/' },
+
+  ];
+
+  let out = input;
+  map.forEach(({ pt, en }) => {
+    out = out.replace(pt, en);
+  });
+  return out;
+}
 
 
   
@@ -526,7 +560,7 @@ function insertSnippet(text, parent, key, options) {
     container.appendChild(document.createTextNode(text));
   }
 
-  if (!options.noScroll && parent && typeof parent === 'object') {
+  if (!options.noScroll) {
     if (parent.scrollTimeoutId)
       clearTimeout(parent.scrollTimeoutId);
     parent.scrollTimeoutId = setTimeout(function() {
@@ -535,7 +569,7 @@ function insertSnippet(text, parent, key, options) {
     }, 100);
   }
 
-  if (snippet.parentElement !== parent && parent)
+  if (snippet.parentElement !== parent)
     parent.appendChild(snippet);
 }
 function removeSnippet(parent, key) {
@@ -628,20 +662,7 @@ window.addEventListener('DOMContentLoaded', function() {
     turtle_ctx,
     canvas_element.width, canvas_element.height, $('#overlay'));
 
-  logo = new LogoInterpreter(
-    turtle, stream,
-    function (name, def) {
-      if (savehook) {
-        savehook(name, def);
-      }
-    });
-  // addTranslation(logo) -- no longer needed, aliases are in localization file
-  logo.run('cs');
-  initStorage(function (def) {
-    logo.run(def);
-  });
-
-  // addTranslation function removed -- all aliases are now in the localization file
+  // Logo interpreter will be initialized after localization is complete
 
   function saveDataAs(dataURL, filename) {
     if (!('download' in document.createElement('a')))
@@ -656,28 +677,23 @@ window.addEventListener('DOMContentLoaded', function() {
     return true;
   }
 
-  var saveLibraryBtn = $('#savelibrary');
-  if (saveLibraryBtn) saveLibraryBtn.addEventListener('click', function() {
+  $('#savelibrary').addEventListener('click', function() {
     var library = logo.procdefs().replace('\n', '\r\n');
     var url = 'data:text/plain,' + encodeURIComponent(library);
     if (!saveDataAs(url, 'logo_library.txt'))
       Dialog.alert("Sorry, not supported by your browser");
   });
-  var screenshotBtn = $('#screenshot');
-  if (screenshotBtn) screenshotBtn.addEventListener('click', function() {
+  $('#screenshot').addEventListener('click', function() {
     var canvas = document.querySelector('#sandbox');
-    if (!canvas) return;
     var url = canvas.toDataURL('image/png');
     if (!saveDataAs(url, 'logo_drawing.png'))
       Dialog.alert("Sorry, not supported by your browser");
   });
-  var clearHistoryBtn = $('#clearhistory');
-  if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', function() {
+  $('#clearhistory').addEventListener('click', function() {
     if (!confirm(__('Clear history: Are you sure?'))) return;
     clearhistoryhook();
   });
-  var clearLibraryBtn = $('#clearlibrary');
-  if (clearLibraryBtn) clearLibraryBtn.addEventListener('click', function() {
+  $('#clearlibrary').addEventListener('click', function() {
     if (!confirm(__('Clear library: Are you sure?'))) return;
     logo.run('erall');
   });
@@ -688,6 +704,42 @@ window.addEventListener('DOMContentLoaded', function() {
   //
   // Localization
   //
+  
+  function applyInterpreterLocalization(interpreterData) {
+    if ('messages' in interpreterData) {
+      logo.localize = function(s) {
+        return interpreterData.messages[s];
+      };
+    }
+
+    if ('keywords' in interpreterData) {
+      logo.keywordAlias = function(s) {
+        return interpreterData.keywords[s];
+      };
+    }
+
+
+
+    if ('procedures' in interpreterData) {
+      // Set up procedure alias translation
+      logo.procedureAlias = function(s) {
+        return interpreterData.procedures[s];
+      };
+      
+      // Also create procedure copies for backward compatibility
+      (function(aliases) {
+        Object.keys(aliases).forEach(function(alias) {
+          try {
+            logo.copydef(alias, aliases[alias]);
+          } catch (e) {
+            // Ignore errors for procedures that don't exist or can't be copied
+            console.warn('Could not create alias for ' + alias + ': ' + e.message);
+          }
+        });
+      }(interpreterData.procedures));
+    }
+  }
+  
   var localizationComplete = (function() {
     function localize(data) {
       if ('page' in data) {
@@ -723,41 +775,28 @@ window.addEventListener('DOMContentLoaded', function() {
       }
 
       if ('interpreter' in data) {
-        if ('messages' in data.interpreter) {
-          logo.localize = function(s) {
-            return data.interpreter.messages[s];
-          };
-        }
-
-        if ('keywords' in data.interpreter) {
-          logo.keywordAlias = function(s) {
-            return data.interpreter.keywords[s];
-          };
-          // Register all keyword aliases as synonyms for their English commands
-          Object.keys(data.interpreter.keywords).forEach(function(alias) {
-            var eng = data.interpreter.keywords[alias];
-            if (logo.routines && logo.routines.get && logo.routines.set && logo.routines.get(eng)) {
-              logo.routines.set(alias, logo.routines.get(eng));
-            }
-          });
-        }
-
-        if ('procedures' in data.interpreter) {
-          (function(aliases) {
-            Object.keys(aliases).forEach(function(alias) {
-              logo.copydef(alias, aliases[alias]);
-            });
-          }(data.interpreter.procedures));
+        // Store interpreter data for later when logo object is created
+        window.logoInterpreterData = data.interpreter;
+        
+        if (logo) {
+          // Logo interpreter already exists, apply settings immediately
+          applyInterpreterLocalization(data.interpreter);
         }
       }
 
-      if ('graphics' in data) {
-        if ('colors' in data.graphics) {
-          turtle.colorAlias = function(s) {
+      if ('graphics' in data && 'colors' in data.graphics) {
+        // Store color data for later when logo object is created
+        window.logoColorData = data.graphics.colors;
+        
+        if (logo) {
+          // Logo interpreter already exists, apply colors immediately
+          logo.colorAlias = function(s) {
             return data.graphics.colors[s];
           };
         }
       }
+
+
     }
 
     var lang = queryParams.lang || navigator.language || navigator.userLanguage;
@@ -767,7 +806,9 @@ window.addEventListener('DOMContentLoaded', function() {
     lang = lang.split('-')[0];
     document.body.lang = lang;
 
-    if (lang === 'en') return Promise.resolve();
+    if (lang === 'en') {
+      return Promise.resolve();
+    }
     return fetch('l10n/lang-' + lang + '.json')
       .then(function(response) {
         if (!response.ok) throw Error(response.statusText);
@@ -792,28 +833,57 @@ window.addEventListener('DOMContentLoaded', function() {
     })
     .then(function(text) {
       var select = $('#select-lang');
-      if (select) {
-        text.split(/\r?\n/g).forEach(function(entry) {
-          var match = /^(\w+)\s+(.*)$/.exec(entry);
-          if (!match) return;
-          var opt = document.createElement('option');
-          opt.value = match[1];
-          opt.textContent = match[2];
-          select.appendChild(opt);
-        });
-        select.value = document.body.lang;
-        select.addEventListener('change', function() {
-          var url = String(document.location);
-          url = url.replace(/[?#].*/, '');
-          document.location = url + '?lang=' + select.value;
-        });
-      }
+      text.split(/\r?\n/g).forEach(function(entry) {
+        var match = /^(\w+)\s+(.*)$/.exec(entry);
+        if (!match) return;
+        var opt = document.createElement('option');
+        opt.value = match[1];
+        opt.textContent = match[2];
+        select.appendChild(opt);
+      });
+      select.value = document.body.lang;
+      select.addEventListener('change', function() {
+        var url = String(document.location);
+        url = url.replace(/[?#].*/, '');
+        document.location = url + '?lang=' + select.value;
+      });
     });
 
   localizationComplete.then(function() {
-  // Keyword aliases are now loaded from l10n/lang-pt.json
-  initInput();
-    // Populate "Examples" sidebar
+    // Initialize Logo interpreter after localization is complete
+    logo = new LogoInterpreter(
+      turtle, stream,
+      function (name, def) {
+        if (savehook) {
+          savehook(name, def);
+        }
+      });
+    
+    // Apply interpreter localization if data was loaded
+    if (window.logoInterpreterData) {
+      applyInterpreterLocalization(window.logoInterpreterData);
+    }
+    
+    // Apply color translations if data was loaded
+    if (window.logoColorData) {
+      logo.colorAlias = function(s) {
+        return window.logoColorData[s];
+      };
+    }
+    
+    logo.run('cs');
+    initStorage(function (def) {
+      logo.run(def);
+    });
+    
+    initInput();
+  });
+
+  //
+  // Populate "Examples" sidebar
+  // (URL may be overwritten by localization file)
+  //
+  localizationComplete.then(function() {
     fetch(examples)
       .then(function(response) {
         if (!response.ok) throw Error(response.statusText);
@@ -828,10 +898,6 @@ window.addEventListener('DOMContentLoaded', function() {
         });
       });
   });
-
-  //
-  // Populate "Examples" sidebar now handled above
-  //
 
   //
   // Demo

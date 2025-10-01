@@ -116,6 +116,20 @@ function LogoInterpreter(turtle, stream, savehook)
   //   }[name];
   // };
   this.keywordAlias = null;
+  
+  // To handle additional procedure aliases (localizations, etc), assign
+  // a function to procedureAlias. Input will be the uppercased word,
+  // output must be one of the procedure names, or undefined.
+  // For example:
+  // logo.procedureAlias = function(name) {
+  //   return {
+  //     'ESC': 'PRINT',
+  //     'PARAFRENTE': 'FD'
+  //     ...
+  //   }[name];
+  // };
+  this.procedureAlias = null;
+  
   function isKeyword(atom, match) {
     if (Type(atom) !== 'word')
       return false;
@@ -952,6 +966,10 @@ function LogoInterpreter(turtle, stream, savehook)
     if (self.keywordAlias) {
       name = self.keywordAlias(name) || name;
     }
+    // Check for procedure aliases (e.g., Portuguese command translations)
+    if (self.procedureAlias) {
+      name = self.procedureAlias(name) || name;
+    }
     var procedure = self.routines.get(name);
     if (!procedure) {
 
@@ -1291,10 +1309,6 @@ function LogoInterpreter(turtle, stream, savehook)
   //
   // Procedures and Flow Control
   //
-
-
-  def('end', function() {
-  });
 
   def("to", function(list) {
     var name = sexpr(list.shift());

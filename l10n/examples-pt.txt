@@ -1,0 +1,61 @@
+aprenda estrela
+  repita 5 [ pf 100 pd 144 ]
+fim
+tartaruga
+estrela
+
+aprenda quadrado :tamanho
+  repita 4 [ pf :tamanho pd 90 ]
+fim
+aprenda coraleatoria
+  mudecl escolha [ vermelho laranja amarelo verde azul violeta ]
+fim
+tartaruga
+repita 36 [ coraleatoria quadrado aleatório 200 pd 10 ]
+
+tartaruga janela desaparecatat
+repita 144 [
+  mudealturarotulo contevezes
+  usenada
+  pf contevezes * contevezes / 30
+  rotule "Logo
+  pt contevezes * contevezes / 30
+  ul
+  pd 10
+  espere 5
+]
+apareçatat
+
+aprenda arvore :tamanho
+   se :tamanho < 5 [parafrente :tamanho paratrás :tamanho pare]
+   parafrente :tamanho/3
+   pe 30 arvore :tamanho*2/3 pd 30
+   parafrente :tamanho/6
+   pd 25 arvore :tamanho/2 pe 25
+   parafrente :tamanho/3
+   pd 25 arvore :tamanho/2 pe 25
+   parafrente :tamanho/6
+   paratrás :tamanho
+fim
+tartaruga
+arvore 150
+
+aprenda samambaia :tamanho :sinal
+  se :tamanho < 1 [ pare ]
+  pf :tamanho
+  pd 70 * :sinal samambaia :tamanho * 0.5 :sinal * -1 pe 70 * :sinal
+  pf :tamanho
+  pe 70 * :sinal samambaia :tamanho * 0.5 :sinal pd 70 * :sinal
+  pd 7 * :sinal samambaia :tamanho - 1 :sinal pe 7 * :sinal
+  pt :tamanho * 2
+fim
+janela tartaruga un pt 150 ul
+samambaia 25 1
+
+tartaruga
+mudetat 2 usenada pd 90 pf 100 pe 90 ul
+repita 100 [
+  mudetat 1 pf aleatório 4
+  mudetat 2 pf aleatório 4
+  espere 2
+]
