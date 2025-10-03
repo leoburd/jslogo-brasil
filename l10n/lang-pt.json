@@ -88,6 +88,10 @@
       "UN": "PENUP",
       "USEBORRACHA": "PENERASE",
       "UB": "PENERASE",
+      "USETINTA": "PENPAINT",
+      "UT": "PENPAINT",
+      "USEINVERSOR": "PENREVERSE",
+      "UI": "PENREVERSE",
       "CORDOLAPIS": "PENCOLOR",
       "CORDOLÁPIS": "PENCOLOR",
       "CL": "PENCOLOR",
@@ -112,7 +116,14 @@
       "CONTEVEZES": "REPCOUNT",
       "CV": "REPCOUNT",
       "MUDEALTURAROTULO": "SETLABELHEIGHT",
-      "MUDETAT": "SETTURTLE"
+      "MUDETAT": "SETTURTLE",
+      "TESTE": "TEST",
+      "SEVERD": "IFTRUE",
+      "SEFALSO": "IFFALSE",
+      "VERDADEIRO": "TRUE",
+      "VERD": "TRUE",
+      "FALSO": "FALSE",
+      "FALS": "FALSE"
     },
     "messages": {
       "Can't apply {_PROC_} to special {name:U}": "Não é possível aplicar {_PROC_} a especial {name:U}",
